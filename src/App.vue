@@ -1,76 +1,69 @@
 <template>
-  <div>
-    <h2>Force-Direct Graph</h2>
-    <svg width="960" height="600" class="container-border"></svg>
+  <div class="flex items-center justify-center w-full min-h-screen">
+    <svg class="bg-gray-200" width="960" height="600"></svg>
   </div>
 </template>
 <script>
 import * as d3 from "d3";
 export default {
   mounted() {
-    let margin = { top: 60, bottom: 60, left: 60, right: 60 };
-    let svg = d3.select("svg");
-    let width = svg.attr("width");
-    let height = svg.attr("height");
-    let g = svg
-      .append("g")
-      .attr("transform", "translate(" + margin.top + "," + margin.left + ")");
-    // prepare data
-    // node set
-    let nodes = [
-      { name: "Hunan Shaoyang" },
-      { name: "Shandong Taian" },
-      { name: "Guangdong Yangjiang" },
-      { name: "Shanxi Taiyuan" },
-      { name: "bright" },
-      { name: "Li hau tan" },
-      { name: "Misbah" },
-      { name: "Xiao Ming" },
-      { name: "Group leader" },
+    const margin = { top: 60, bottom: 60, left: 60, right: 60 };
+    const svg = d3.select("svg");
+    const width = svg.attr("width");
+    const height = svg.attr("height");
+
+    const g = svg.append("g");
+
+    const nodes = [
+      { id: 1, name: "Price Goyette", avatar: "1.jpeg" },
+      { id: 2, name: "Giovanna Sawayn", avatar: "2.jpeg" },
+      { id: 3, name: "Nils Considine", avatar: "3.jpeg" },
+      { id: 4, name: "Henderson Rosenbaum", avatar: "4.jpeg" },
+      { id: 5, name: "Myron Bergnaum", avatar: "5.jpeg" },
+      { id: 6, name: "Crystel Gorczany", avatar: "6.jpeg" },
+      { id: 7, name: "Ulises Morissette", avatar: "7.jpeg" },
+      { id: 8, name: "Dahlia Wilkinson", avatar: "8.jpeg" },
+      { id: 9, name: "Clarabelle Anderson", avatar: "9.jpeg" },
     ];
-    // edge set
-    let edges = [
-      { source: 0, target: 4, relation: "hometown", value: 1.3 },
-      { source: 4, target: 5, relation: "Roommate", value: 1 },
-      { source: 4, target: 6, relation: "Roommate", value: 1 },
-      { source: 4, target: 7, relation: "Roommate", value: 1 },
-      { source: 1, target: 6, relation: "hometown", value: 2 },
-      { source: 2, target: 5, relation: "hometown", value: 0.9 },
-      { source: 3, target: 7, relation: "hometown", value: 1 },
-      { source: 5, target: 6, relation: "classmate", value: 1.6 },
-      { source: 6, target: 7, relation: "friend", value: 0.7 },
-      { source: 6, target: 8, relation: "responsibility", value: 2 },
+
+    const edges = [
+      { source: 0, target: 4, value: 1 },
+      { source: 4, target: 5, value: 1 },
+      { source: 4, target: 6, value: 1 },
+      { source: 4, target: 7, value: 1 },
+      { source: 1, target: 6, value: 1 },
+      { source: 2, target: 5, value: 1 },
+      { source: 3, target: 7, value: 1 },
+      { source: 5, target: 6, value: 1 },
+      { source: 6, target: 7, value: 1 },
+      { source: 6, target: 8, value: 1 },
     ];
-    // Set a color scale
-    let colorScale = d3
+
+    const colorScale = d3
       .scaleOrdinal()
       .domain(d3.range(nodes.length))
       .range(d3.schemeCategory10);
-    // Create a new force-directed graph
-    let forceSimulation = d3
+
+    const forceSimulation = d3
       .forceSimulation()
       .force("link", d3.forceLink())
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter());
-    // Generate node data
+
     forceSimulation.nodes(nodes).on("tick", ticked);
-    // Generate edge data
+
     forceSimulation
       .force("link")
       .links(edges)
       .distance(function (d) {
-        // length of each side
-        return d.value * 100;
+        return d.value * 200;
       });
-    // Set the center position of the graph
+
     forceSimulation
       .force("center")
       .x(width / 2)
       .y(height / 2);
-    // // Vertex set, edge set
-    // console.log(nodes)
-    // console.log(edges)
-    // draw edges
+
     let links = g
       .append("g")
       .selectAll("line")
@@ -81,7 +74,7 @@ export default {
         return colorScale(i);
       })
       .attr("stroke-width", 1);
-    // text on the side
+
     let linksText = g
       .append("g")
       .selectAll("text")
@@ -91,7 +84,7 @@ export default {
       .text(function (d) {
         return d.relation;
       });
-    // Create group
+
     let gs = g
       .selectAll(".circleText")
       .data(nodes)
@@ -103,21 +96,36 @@ export default {
         return "translate(" + cirX + "," + cirY + ")";
       })
       .call(d3.drag().on("start", started).on("drag", dragged).on("end", ended));
-    // draw nodes
+
+    gs.append("defs")
+      .append("pattern")
+      .attr("x", "0%")
+      .attr("y", "0%")
+      .attr("height", "100%")
+      .attr("width", "100%")
+      .attr("viewBox", "0 0 32 32")
+      .attr("id", (d) => `avatar-${d.id}`)
+      .attr("preserveAspectRatio", "xMidYMid slice")
+      .append("image")
+      .attr("width", 32)
+      .attr("height", 32)
+      .attr("href", (d) => `./assets/${d.avatar}`);
+
     gs.append("circle")
-      .attr("r", 10)
-      .attr("fill", function (d, i) {
-        return colorScale(i);
-      });
+      .attr("stroke", "#fff")
+      .attr("fill", "#ccc")
+      .attr("fill", (d) => `url(#avatar-${d.id})`)
+      .attr("r", 32);
+
     // Word
     gs.append("text")
-      .attr("x", -10)
-      .attr("y", -20)
-      .attr("dy", 10)
+      .attr("x", -16)
+      .attr("y", 36)
+      .attr("dy", 0)
       .text(function (d) {
         return d.name;
       });
-    // ticked
+
     function ticked() {
       links
         .attr("x1", function (d) {
