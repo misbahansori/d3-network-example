@@ -1,18 +1,21 @@
 <template>
   <div class="flex items-center justify-center w-full min-h-screen">
-    <svg class="bg-gray-200" width="960" height="600"></svg>
+    <svg class="w-full min-h-screen bg-gray-200" width="1000" height="600"></svg>
   </div>
 </template>
 <script>
 import * as d3 from "d3";
 export default {
   mounted() {
-    const margin = { top: 60, bottom: 60, left: 60, right: 60 };
     const svg = d3.select("svg");
     const width = svg.attr("width");
     const height = svg.attr("height");
 
-    const g = svg.append("g");
+    const margin = { top: 60, bottom: 60, left: 60, right: 60 };
+
+    const g = svg
+      .append("g")
+      .attr("transform", "translate(" + margin.top + "," + margin.left + ")");
 
     const nodes = [
       { id: 1, name: "Price Goyette", avatar: "1.jpeg" },
@@ -46,25 +49,21 @@ export default {
 
     const forceSimulation = d3
       .forceSimulation()
-      .force("link", d3.forceLink())
       .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter());
+      .force("link", d3.forceLink())
+      .force("center", d3.forceCenter())
+      .force("collision", d3.forceCollide().radius(100));
 
     forceSimulation.nodes(nodes).on("tick", ticked);
 
-    forceSimulation
-      .force("link")
-      .links(edges)
-      .distance(function (d) {
-        return d.value * 200;
-      });
+    forceSimulation.force("link").links(edges).distance(100);
 
     forceSimulation
       .force("center")
       .x(width / 2)
       .y(height / 2);
 
-    let links = g
+    const links = g
       .append("g")
       .selectAll("line")
       .data(edges)
@@ -75,7 +74,7 @@ export default {
       })
       .attr("stroke-width", 1);
 
-    let linksText = g
+    const linksText = g
       .append("g")
       .selectAll("text")
       .data(edges)
@@ -85,7 +84,7 @@ export default {
         return d.relation;
       });
 
-    let gs = g
+    const gs = g
       .selectAll(".circleText")
       .data(nodes)
       .enter()
@@ -109,6 +108,7 @@ export default {
       .append("image")
       .attr("width", 32)
       .attr("height", 32)
+      .attr("preserveAspectRatio", "xMinYMin slice")
       .attr("href", (d) => `./assets/${d.avatar}`);
 
     gs.append("circle")
@@ -119,9 +119,9 @@ export default {
 
     // Word
     gs.append("text")
-      .attr("x", -16)
-      .attr("y", 36)
-      .attr("dy", 0)
+      .attr("y", 50)
+      .attr("alignment-baseline", "middle")
+      .attr("text-anchor", "middle")
       .text(function (d) {
         return d.name;
       });
