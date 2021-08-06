@@ -1,21 +1,23 @@
 <template>
   <div class="flex items-center justify-center w-full min-h-screen">
-    <svg class="w-full min-h-screen bg-gray-200" width="1000" height="600"></svg>
+    <svg
+      ref="network"
+      id="network"
+      class="w-full min-h-screen bg-gray-200"
+      width="1000"
+      height="600"
+    ></svg>
   </div>
 </template>
 <script>
 import * as d3 from "d3";
 export default {
   mounted() {
-    const svg = d3.select("svg");
-    const width = svg.attr("width");
-    const height = svg.attr("height");
+    const svg = d3.select("#network");
+    const width = this.$refs.network.clientWidth;
+    const height = this.$refs.network.clientHeight;
 
-    const margin = { top: 60, bottom: 60, left: 60, right: 60 };
-
-    const g = svg
-      .append("g")
-      .attr("transform", "translate(" + margin.top + "," + margin.left + ")");
+    const g = svg.append("g");
 
     const nodes = [
       { id: 1, name: "Price Goyette", avatar: "1.jpeg" },
@@ -49,10 +51,10 @@ export default {
 
     const forceSimulation = d3
       .forceSimulation()
-      .force("charge", d3.forceManyBody())
+      .force("charge", d3.forceManyBody().strength(-1000))
       .force("link", d3.forceLink())
       .force("center", d3.forceCenter())
-      .force("collision", d3.forceCollide().radius(100));
+      .force("collision", d3.forceCollide().radius(60));
 
     forceSimulation.nodes(nodes).on("tick", ticked);
 
